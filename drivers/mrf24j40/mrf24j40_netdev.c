@@ -37,8 +37,8 @@
 
 #define _MAX_MHR_OVERHEAD   (25)
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count);
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info);
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count);
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev2_t *netdev);
 static void _isr(netdev2_t *netdev);
 static int _get(netdev2_t *netdev, netopt_t opt, void *val, size_t max_len);
@@ -92,9 +92,8 @@ static int _init(netdev2_t *netdev)
     return 0;
 }
 
-static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
+static int _send(netdev2_t *netdev, const struct iovec *vector, unsigned count)
 {
-
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     const struct iovec *ptr = vector;
     size_t len = 0;
@@ -129,7 +128,7 @@ static int _send(netdev2_t *netdev, const struct iovec *vector, int count)
 
 }
 
-static int _recv(netdev2_t *netdev, char *buf, int len, void *info)
+static int _recv(netdev2_t *netdev, void *buf, size_t len, void *info)
 {
     uint8_t bbreg1;
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
@@ -649,7 +648,7 @@ static void _isr(netdev2_t *netdev)
 
     /*****RECEIVE INTERRUPT OCCURED*****/
     if (intstat & MRF24J40_INTSTAT_MASK__RXIF) {
-        if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON || state == MRF24J40_PSEUDO_STATE_BUSY_RX_AACK) {
+        //if (state == MRF24J40_PSEUDO_STATE_RX_AACK_ON || state == MRF24J40_PSEUDO_STATE_BUSY_RX_AACK) {
             DEBUG("[mrf24j40] EVT - RX_END\n");
             if (!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
                 /* re-enable IRQs */
@@ -657,7 +656,7 @@ static void _isr(netdev2_t *netdev)
                 return;
             }
             netdev->event_callback(netdev, NETDEV2_EVENT_RX_COMPLETE);
-        }
+        //}
     } // end of RXIF check
 
 

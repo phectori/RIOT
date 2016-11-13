@@ -66,9 +66,6 @@ void mrf24j40_init(mrf24j40_t *dev)
     /* reset RF state machine */
     mrf24j40_reset_state_machine(dev);
 
-    xtimer_usleep(200);
-    //Delay for 192 us after RF State Machine Reset
-
     do {
         rfstate = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFSTATE);
     } while ((rfstate & 0xA0) != 0xa0);
