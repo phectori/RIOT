@@ -179,6 +179,7 @@ typedef struct {
     uint8_t pending_tx;                     /**< keep track of pending TX calls
                                                this is required to know when to
                                                return to @ref mrf24j40_t::idle_state */
+    uint8_t header_len;
 } mrf24j40_t;
 
 /**
