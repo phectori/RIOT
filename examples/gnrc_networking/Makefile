@@ -2,7 +2,7 @@
 APPLICATION = gnrc_networking
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native
+BOARD ?= nucleo-f401
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -11,6 +11,8 @@ BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
                           nrf6310 nucleo-f103 nucleo-f334 pca10000 pca10005 spark-core \
                           stm32f0discovery telosb weio wsn430-v1_3b wsn430-v1_4 \
                           yunjia-nrf51822 z1 nucleo-f072
+
+FEATURES_REQUIRED = periph_spi periph_gpio
 
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -32,6 +34,8 @@ USEMODULE += shell_commands
 USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
+
+USEMODULE += mrf24j40
 
 # Set a custom 802.15.4 channel if needed
 DEFAULT_CHANNEL ?= 26

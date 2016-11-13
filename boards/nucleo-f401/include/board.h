@@ -37,6 +37,14 @@ extern "C" {
 #define XTIMER_BACKOFF      (5)
 /** @} */
 
+#define MRF24J40_PARAM_SPI         (SPI_0)
+#define MRF24J40_PARAM_SPI_SPEED   (SPI_SPEED_5MHZ)
+#define MRF24J40_PARAM_CS          (GPIO_PIN(0, 8))
+#define MRF24J40_PARAM_INT         (GPIO_PIN(1, 10))
+#define MRF24J40_PARAM_SLEEP       (GPIO_PIN(2, 7))
+#define MRF24J40_PARAM_RESET       (GPIO_PIN(1, 4))
+
+
 #ifdef __cplusplus
 }
 #endif

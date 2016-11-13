@@ -28,4 +28,8 @@ void board_init(void)
 
     /* initialize the boards LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
+
+    /* Power of the mrf module */
+    gpio_init(GPIO_PIN(1, 6), GPIO_OUT);
+    gpio_set(GPIO_PIN(1, 6));
 }
