@@ -10,10 +10,19 @@
  * @defgroup    drivers_bme280 BME280
  * @ingroup     drivers_sensors
  * @brief       Device driver interface for the BME280 sensor
- * @{
  *
+ * @{
  * @file
  * @brief       Device driver interface for the BME280 sensor.
+ *
+ * @details     There are three sensor values that can be read: temperature,
+ *              pressure and humidity.  The BME280 device usually measures them
+ *              all at once.  It is possible to skip measuring either of the
+ *              values by changing the oversampling settings.  The driver is
+ *              written in such a way that a measurement is only started from
+ *              the function that reads the temperature.  In other words, you
+ *              always have to call bme280_read_temperature, and then optionally
+ *              you can call the other two.
  *
  * @author      Kees Bakker <kees@sodaq.com>
  */
@@ -191,6 +200,9 @@ int16_t bme280_read_temperature(bme280_t* dev);
 /**
  * @brief Read humidity value from the given BME280 device, returned in centi %RH
  *
+ * @details This function should only be called after doing bme280_read_temperature
+ *          first.
+ *
  * @param[in]  dev          Device descriptor of BME280 device to read from
  *
  * @returns                 Humidity in centi %RH (i.e. the percentage times 100)
@@ -200,23 +212,14 @@ uint16_t bme280_read_humidity(bme280_t *dev);
 /**
  * @brief Read air pressure value from the given BME280 device, returned in PA
  *
+ * @details This function should only be called after doing bme280_read_temperature
+ *          first.
+ *
  * @param[in]  dev          Device descriptor of BME280 device to read from
  *
  * @returns                 The air pressure in Pa
  */
 uint32_t bme280_read_pressure(bme280_t *dev);
-
-/**
- * @brief Read identification code from the given BME280 device
- *
- * @param[in]  dev          Device descriptor of BME280 device to read from
- * @param[out] buffer       Buffer for the result of the identification code
- * @param[in]  buflen       The size of the buffer
- *
- * @return                  >= 0 on success, number of bytes read
- * @return                  -1 if the code could not be acquired
- */
-int bme280_read_ident(bme280_t *dev, uint8_t * buffer, size_t buflen);
 
 #ifdef __cplusplus
 }
