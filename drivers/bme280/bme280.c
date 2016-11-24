@@ -195,11 +195,9 @@ int16_t bme280_read_temperature(bme280_t* dev)
 /*
  * Returns pressure in Pa
  */
-int bme280_read_pressure(bme280_t *dev, float *pressure)
+uint32_t bme280_read_pressure(bme280_t *dev)
 {
-    if (pressure) {
-        *pressure = 0;
-    }
+    assert(!dev);
 
     bme280_calibration_t *cal = &dev->calibration;      /* helper variable */
 
@@ -229,17 +227,13 @@ int bme280_read_pressure(bme280_t *dev, float *pressure)
         return -2;
     }
 
-    if (pressure) {
-        p_acc = 1048576 - adc_P;
-        p_acc = (((p_acc << 31) - var2) * 3125) / var1;
-        var1 = (((int64_t)cal->dig_P9) * (p_acc >> 13) * (p_acc >> 13)) >> 25;
-        var2 = (((int64_t)cal->dig_P8) * p_acc) >> 19;
-        p_acc = ((p_acc + var1 + var2) >> 8) + (((int64_t)cal->dig_P7) << 4);
-        /* p_acc = p_acc >> 8; */
-        *pressure = (float)p_acc / 256;
-    }
+    p_acc = 1048576 - adc_P;
+    p_acc = (((p_acc << 31) - var2) * 3125) / var1;
+    var1 = (((int64_t)cal->dig_P9) * (p_acc >> 13) * (p_acc >> 13)) >> 25;
+    var2 = (((int64_t)cal->dig_P8) * p_acc) >> 19;
+    p_acc = ((p_acc + var1 + var2) >> 8) + (((int64_t)cal->dig_P7) << 4);
 
-    return 0;
+    return p_acc >> 8;
 }
 
 int bme280_read_humidity(bme280_t *dev, float *humidity)

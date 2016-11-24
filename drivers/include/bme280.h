@@ -200,15 +200,13 @@ int16_t bme280_read_temperature(bme280_t* dev);
 int bme280_read_humidity(bme280_t *dev, float *humidity);
 
 /**
- * @brief Read air pressure value from the given BME280 device, returned in hPA
+ * @brief Read air pressure value from the given BME280 device, returned in PA
  *
  * @param[in]  dev          Device descriptor of BME280 device to read from
- * @param[out] pressure     Pressure in hPA
  *
- * @return                  0 on success
- * @return                  -1 if the sensor data could not be acquired
+ * @returns                 The air pressure in Pa
  */
-int bme280_read_pressure(bme280_t *dev, float *pressure);
+uint32_t bme280_read_pressure(bme280_t *dev);
 
 /**
  * @brief Read identification code from the given BME280 device
