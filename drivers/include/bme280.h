@@ -148,17 +148,6 @@ typedef struct {
     bme280_calibration_t calibration;   /**< Calibration Data */
 } bme280_t;
 
-#if 0
-/**
- * @brief Device initialization parameters
- */
-typedef struct {
-    i2c_t i2c_dev;
-    uint8_t i2c_addr;
-    bme280_settings_t settings;
-} bme280_params_t;
-#endif
-
 /**
  * @brief auto-initialize all configured BME280 devices
  */
