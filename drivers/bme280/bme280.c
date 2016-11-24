@@ -163,7 +163,7 @@ int16_t bme280_read_temperature(bme280_t* dev)
     assert(!dev);
 
     if (do_measurement(dev) < 0) {
-        return -1;
+        return INT16_MIN;
     }
 
     bme280_calibration_t *cal = &dev->calibration;      /* helper variable */
@@ -224,7 +224,7 @@ uint32_t bme280_read_pressure(bme280_t *dev)
     var1 = (((((int64_t)1) << 47) + var1)) * ((int64_t)cal->dig_P1) >> 33;
     /* Avoid division by zero */
     if (var1 == 0) {
-        return -2;
+        return UINT32_MAX;
     }
 
     p_acc = 1048576 - adc_P;
@@ -236,11 +236,9 @@ uint32_t bme280_read_pressure(bme280_t *dev)
     return p_acc >> 8;
 }
 
-int bme280_read_humidity(bme280_t *dev, float *humidity)
+uint16_t bme280_read_humidity(bme280_t *dev)
 {
-    if (humidity) {
-        *humidity = 0;
-    }
+    assert(!dev);
 
     bme280_calibration_t *cal = &dev->calibration;      /* helper variable */
 
@@ -269,10 +267,8 @@ int bme280_read_humidity(bme280_t *dev, float *humidity)
     var1 = (var1 - (((((var1 >> 15) * (var1 >> 15)) >> 7) * ((int32_t)cal->dig_H1)) >> 4));
     var1 = (var1 < 0 ? 0 : var1);
     var1 = (var1 > 419430400 ? 419430400 : var1);
-    if (humidity) {
-        *humidity = (float)((uint32_t)var1 >> 12) / 1024;
-    }
-    return 0;
+    /* First multiply to avoid losing the accuracy after the shift by ten */
+    return (100 * ((uint32_t)var1 >> 12)) >> 10;
 }
 
 /* Read compensation data, 0x88..0x9F, 0xA1, 0xE1..0xE7 */

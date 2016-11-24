@@ -189,15 +189,13 @@ int bme280_reset(bme280_t* dev);
 int16_t bme280_read_temperature(bme280_t* dev);
 
 /**
- * @brief Read humidity value from the given BME280 device, returned in %RH
+ * @brief Read humidity value from the given BME280 device, returned in centi %RH
  *
  * @param[in]  dev          Device descriptor of BME280 device to read from
- * @param[out] humidity     Humidity in %RH
  *
- * @return                  0 on success
- * @return                  -1 if the sensor data could not be acquired
+ * @returns                 Humidity in centi %RH (i.e. the percentage times 100)
  */
-int bme280_read_humidity(bme280_t *dev, float *humidity);
+uint16_t bme280_read_humidity(bme280_t *dev);
 
 /**
  * @brief Read air pressure value from the given BME280 device, returned in PA

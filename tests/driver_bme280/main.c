@@ -58,7 +58,7 @@ int main(void)
 #endif
     int16_t temperature;
     uint32_t pressure;
-    float humidity;
+    uint16_t humidity;
     //float altitude;
     //float pressure_0;
     int result;
@@ -110,7 +110,7 @@ int main(void)
         pressure = bme280_read_pressure(&dev);
 
         /* Get pressure in %rH */
-        bme280_read_humidity(&dev, &humidity);
+        humidity = bme280_read_humidity(&dev);
 
         /* Get pressure at sealevel in Pa */
         //bme280_sealevel_pressure(&dev, (int32_t)TEST_ALTITUDE, &pressure_0);
@@ -120,11 +120,11 @@ int main(void)
 
         printf("Temperature [°C]: %d.%d\n"
                "Pressure [Pa]: %ld\n"
-               "Humidity [%%rH]: %.2f\n"
+               "Humidity [%%rH]: %u.%02u\n"
                "\n+-------------------------------------+\n",
                temperature / 100, (temperature % 100) / 10,
 	       (unsigned long)pressure,
-               humidity);
+               (unsigned int)(humidity / 100), (unsigned int)(humidity % 100));
         xtimer_usleep(SLEEP_2S);
     }
 
