@@ -11,7 +11,8 @@
  * @{
  *
  * @file
- * @brief       Test application for the BME280 pressure and temperature sensor
+ * @brief       Test application for the BME280 temperature, pressure
+ *              and humidity sensor.
  *
  * @author      Kees Bakker <kees@sodaq.com>
  *
@@ -55,7 +56,7 @@ int main(void)
         .humidOverSample = BME280_OSRS_X1,
     };
 #endif
-    float temperature;
+    int16_t temperature;
     float pressure;
     float humidity;
     //float altitude;
@@ -102,8 +103,8 @@ int main(void)
 
     printf("\n+--------Starting Measurements--------+\n");
     while (1) {
-        /* Get temperature in deci degrees celsius */
-        bme280_read_temperature(&dev, &temperature);
+        /* Get temperature in centi degrees celsius */
+        temperature = bme280_read_temperature(&dev);
 
         /* Get pressure in Pa */
         bme280_read_pressure(&dev, &pressure);
@@ -117,11 +118,11 @@ int main(void)
         /* Get altitude in meters */
         //bme280_altitude(&dev, pressure_0, &altitude);
 
-        printf("Temperature [°C]: %.1f\n"
+        printf("Temperature [°C]: %d.%d\n"
                "Pressure [hPa]: %.2f\n"
                "Humidity [%%rH]: %.2f\n"
                "\n+-------------------------------------+\n",
-               temperature,
+               temperature / 100, (temperature % 100) / 10,
 	       pressure / 100.0,
                humidity);
         xtimer_usleep(SLEEP_2S);

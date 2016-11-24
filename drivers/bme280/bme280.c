@@ -158,14 +158,9 @@ void bme280_auto_init(void)
  * Returns temperature in DegC, resolution is 0.01 DegC.
  * t_fine carries fine temperature as global value
  */
-int bme280_read_temperature(bme280_t* dev, float* temperature)
+int16_t bme280_read_temperature(bme280_t* dev)
 {
-    if (!dev) {
-        return -1;
-    }
-    if (temperature) {
-        *temperature = 0;
-    }
+    assert(!dev);
 
     if (do_measurement(dev) < 0) {
         return -1;
@@ -194,15 +189,7 @@ int bme280_read_temperature(bme280_t* dev, float* temperature)
     /* calculate t_fine (used for pressure and humidity too) */
     t_fine = var1 + var2;
 
-    float output = (t_fine * 5 + 128) >> 8;
-
-    /* Convert to degrees Celcius */
-    output = output / 100;
-    if (temperature) {
-        *temperature = output;
-    }
-
-    return 0;
+    return (t_fine * 5 + 128) >> 8;
 }
 
 /*

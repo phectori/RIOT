@@ -182,12 +182,11 @@ int bme280_reset(bme280_t* dev);
  * @brief Read temperature value from the given BME280 device, returned in °C
  *
  * @param[in] dev           Device descriptor of BME280 device to read from
- * @param[out] temperature  Temperature in °C
  *
- * @return                  0 on success
- * @return                  -1 if the sensor data could not be acquired
+ * @returns                 The temperature in centi Celsius. In case of an error
+ *                          it returns INT16_MIN.
  */
-int bme280_read_temperature(bme280_t* dev, float* temperature);
+int16_t bme280_read_temperature(bme280_t* dev);
 
 /**
  * @brief Read humidity value from the given BME280 device, returned in %RH
