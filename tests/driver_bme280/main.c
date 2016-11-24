@@ -44,7 +44,9 @@ int main(void)
     bme280_t dev;
 #if 1
     /* Wheather monitoring */
-    bme280_setting_t settings = {
+    bme280_settings_t settings = {
+        .i2c_dev = TEST_I2C,
+        .i2c_addr = TEST_I2C_ADDR,
         .t_sb = BME280_SB_0_5,
         .filter = BME280_FILTER_OFF,
         .runMode = BME280_MODE_FORCED,
@@ -63,7 +65,7 @@ int main(void)
     puts("BME280 test application\n");
 
     printf("+------------Initializing------------+\n");
-    result = bme280_init(&dev, TEST_I2C, TEST_I2C_ADDR, &settings);
+    result = bme280_init(&dev, &settings);
     if (result == -1) {
         puts("[Error] The given i2c is not enabled");
         return 1;

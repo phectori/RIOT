@@ -42,21 +42,19 @@ extern "C" {
     {                                      \
         .i2c_dev = BME280_PARAM_I2C_DEV,   \
         .i2c_addr = BME280_PARAM_I2C_ADDR, \
-        .settings = {                      \
-            .t_sb = BME280_SB_250,         \
-            .filter = BME280_FILTER_2,     \
-            .runMode = BME280_MODE_FORCED, \
-            .tempOverSample = BME280_OSRS_X1, \
-            .pressOverSample = BME280_OSRS_X1, \
-            .humidOverSample = BME280_OSRS_X1, \
-        },                                 \
+        .t_sb = BME280_SB_250,             \
+        .filter = BME280_FILTER_2,         \
+        .runMode = BME280_MODE_FORCED,     \
+        .tempOverSample = BME280_OSRS_X1,  \
+        .pressOverSample = BME280_OSRS_X1, \
+        .humidOverSample = BME280_OSRS_X1, \
     }
 /**@}*/
 
 /**
  * @brief   Configure BME280
  */
-static const bme280_params_t bme280_params[] =
+static const bme280_settings_t bme280_params[] =
 {
 #ifdef BME280_PARAMS_BOARD
     BME280_PARAMS_BOARD,

@@ -113,6 +113,10 @@ typedef enum {
  * These parameters are needed to configure the device at startup.
  */
 typedef struct {
+    /* I2C details */
+    i2c_t i2c_dev;                      /**< I2C device which is used */
+    uint8_t i2c_addr;                   /**< I2C address */
+
     /* Config Register */
     bme280_t_sb_t t_sb;
     bme280_filter_t filter;
@@ -125,26 +129,26 @@ typedef struct {
 
     /* ctrl_hum */
     bme280_osrs_t humidOverSample;      /**< ctrl_hum osrs_h */
-} bme280_setting_t;
+} bme280_settings_t;
 
 /**
  * @brief Device descriptor for the BME280 sensor
  */
 typedef struct {
-    i2c_t i2c_dev;                      /**< I2C device which is used */
-    uint8_t i2c_addr;                   /**< I2C address */
+    bme280_settings_t settings;         /**< Device Settings */
     bme280_calibration_t calibration;   /**< Calibration Data */
-    bme280_setting_t settings;          /**< Device Settings */
 } bme280_t;
 
+#if 0
 /**
  * @brief Device initialization parameters
  */
 typedef struct {
     i2c_t i2c_dev;
     uint8_t i2c_addr;
-    bme280_setting_t settings;
+    bme280_settings_t settings;
 } bme280_params_t;
+#endif
 
 /**
  * @brief auto-initialize all configured BME280 devices
@@ -155,8 +159,6 @@ void bme280_auto_init(void);
  * @brief Initialize the given BME280 device
  *
  * @param[out] dev          Initialized device descriptor of BME280 device
- * @param[in]  i2c          I2C bus the sensor is connected to
- * @param[in]  addr         The I2C address
  * @param[in]  settings     The settings for the BME280 device (sampling rate, etc)
  *
  * @return                  0 on success
@@ -164,7 +166,7 @@ void bme280_auto_init(void);
  * @return                  -2 did not detect BME280
  * @return                  -3 could not read calibration data
  */
-int bme280_init(bme280_t* dev, i2c_t i2c, uint8_t addr, const bme280_setting_t* settings);
+int bme280_init(bme280_t* dev, const bme280_settings_t* settings);
 
 /**
  * @brief Reset the BME280 device
