@@ -34,9 +34,18 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   LED pin definition and handlers
+ * @name Macros for controlling the on-board LEDs.
+ * @{
  */
 #define LED0_PIN            GPIO_PIN(PORT_B, 1)
+
+#define LED_PORT            GPIOB
+#define LED0_MASK           (1 << 1)
+
+#define LED0_ON             (LED_PORT->BSRR = LED0_MASK)
+#define LED0_OFF            (LED_PORT->BRR  = LED0_MASK)
+#define LED0_TOGGLE         (LED_PORT->ODR ^= LED0_MASK)
+/** @} */
 
 /**
  * @brief   User button
