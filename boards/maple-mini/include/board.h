@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Frits Kuipers
+ * Copyright (C) 2016 Frits Kuipers
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -53,9 +53,9 @@ extern "C" {
 #define BTN_B1_PIN          GPIO_PIN(PORT_B, 8)
 
 /**
- * @brief Use the 1st UART for STDIO on this board
+ * @brief Use the USART1 for STDIO on this board
  */
-#define UART_STDIO_DEV      UART_DEV(0)
+#define UART_STDIO_DEV      UART_DEV(1)
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
