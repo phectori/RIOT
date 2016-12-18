@@ -38,12 +38,13 @@ extern "C" {
 #define BME280_PARAM_I2C_ADDR        (0x77)
 #endif
 
+/* Defaults for Weather Monitoring */
 #define BME280_PARAMS_DEFAULT              \
     {                                      \
         .i2c_dev = BME280_PARAM_I2C_DEV,   \
         .i2c_addr = BME280_PARAM_I2C_ADDR, \
-        .t_sb = BME280_SB_250,             \
-        .filter = BME280_FILTER_2,         \
+        .t_sb = BME280_SB_0_5,             \
+        .filter = BME280_FILTER_OFF,       \
         .runMode = BME280_MODE_FORCED,     \
         .tempOverSample = BME280_OSRS_X1,  \
         .pressOverSample = BME280_OSRS_X1, \
@@ -54,7 +55,7 @@ extern "C" {
 /**
  * @brief   Configure BME280
  */
-static const bme280_settings_t bme280_params[] =
+static const bme280_params_t bme280_params[] =
 {
 #ifdef BME280_PARAMS_BOARD
     BME280_PARAMS_BOARD,
@@ -62,30 +63,6 @@ static const bme280_settings_t bme280_params[] =
     BME280_PARAMS_DEFAULT,
 #endif
 };
-
-/**
- * @brief   Get the number of configured BME280 devices
- */
-#define BME280_NUMOF       (sizeof(bme280_params) / sizeof(bme280_params[0]))
-
-#ifdef MODULE_SAUL_REG
-/**
- * @brief   Allocate and configure entries to the SAUL registry
- */
-saul_reg_t bme280_saul_reg[][2] =
-{
-    {
-        {
-            .name = "bme280-temp",
-            .driver = &bme280_temperature_saul_driver
-        },
-        {
-            .name = "bme280-press",
-            .driver = &bme280_pressure_saul_driver
-        },
-    }
-};
-#endif
 
 #ifdef __cplusplus
 }

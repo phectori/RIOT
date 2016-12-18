@@ -117,7 +117,7 @@ typedef enum {
 } bme280_osrs_t;
 
 /**
- * @brief Settings for the BME280 sensor
+ * @brief Parameters for the BME280 sensor
  *
  * These parameters are needed to configure the device at startup.
  */
@@ -138,13 +138,13 @@ typedef struct {
 
     /* ctrl_hum */
     bme280_osrs_t humidOverSample;      /**< ctrl_hum osrs_h */
-} bme280_settings_t;
+} bme280_params_t;
 
 /**
  * @brief Device descriptor for the BME280 sensor
  */
 typedef struct {
-    bme280_settings_t settings;         /**< Device Settings */
+    bme280_params_t params;             /**< Device Parameters */
     bme280_calibration_t calibration;   /**< Calibration Data */
 } bme280_t;
 
@@ -157,14 +157,14 @@ void bme280_auto_init(void);
  * @brief Initialize the given BME280 device
  *
  * @param[out] dev          Initialized device descriptor of BME280 device
- * @param[in]  settings     The settings for the BME280 device (sampling rate, etc)
+ * @param[in]  params       The parameters for the BME280 device (sampling rate, etc)
  *
  * @return                  0 on success
  * @return                  -1 if given I2C is not enabled in board config
  * @return                  -2 did not detect BME280
  * @return                  -3 could not read calibration data
  */
-int bme280_init(bme280_t* dev, const bme280_settings_t* settings);
+int bme280_init(bme280_t* dev, const bme280_params_t* params);
 
 /**
  * @brief Reset the BME280 device
@@ -177,7 +177,7 @@ int bme280_init(bme280_t* dev, const bme280_settings_t* settings);
 int bme280_reset(bme280_t* dev);
 
 /**
- * @brief Read temperature value from the given BME280 device, returned in °C
+ * @brief Read temperature value from the given BME280 device, returned in centi °C
  *
  * @param[in] dev           Device descriptor of BME280 device to read from
  *

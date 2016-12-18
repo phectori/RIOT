@@ -94,11 +94,6 @@ static int16_t get_int16_le(const uint8_t *buffer, size_t offset);
 static void dump_buffer(const char *txt, uint8_t *buffer, size_t size);
 
 /**
- * @brief   Allocation of memory for device descriptors
- */
-static bme280_t bme280_devs[BME280_NUMOF];
-
-/**
  * @brief   Fine resolution temperature value, also needed for pressure and humidity.
  */
 static int32_t t_fine;
@@ -115,14 +110,14 @@ static uint8_t measurement_regs[8];
  *                          BME280 Core API                                  *
  *---------------------------------------------------------------------------*/
 
-int bme280_init(bme280_t* dev, const bme280_settings_t* settings)
+int bme280_init(bme280_t* dev, const bme280_params_t* params)
 {
     uint8_t chip_id;
 
-    dev->settings = *settings;
+    dev->params = *params;
 
     /* Initialize I2C interface */
-    if (i2c_init_master(dev->settings.i2c_dev, I2C_SPEED_NORMAL)) {
+    if (i2c_init_master(dev->params.i2c_dev, I2C_SPEED_NORMAL)) {
         DEBUG("[Error] I2C device not enabled\n");
         return -1;
     }
@@ -131,7 +126,7 @@ int bme280_init(bme280_t* dev, const bme280_settings_t* settings)
     chip_id = read_u8_reg(dev, BME280_CHIP_ID_REG);
     if (chip_id != 0x60) {
         DEBUG("[Error] Did not detect a BME280 at address %02x (%02X != %02X)\n",
-              dev->settings.i2c_addr, chip_id, 0x60);
+              dev->params.i2c_addr, chip_id, 0x60);
         return -2;
     }
 
@@ -142,16 +137,6 @@ int bme280_init(bme280_t* dev, const bme280_settings_t* settings)
     }
 
     return 0;
-}
-
-void bme280_auto_init(void)
-{
-    for (unsigned i = 0; i < BME280_NUMOF; i++) {
-        if (bme280_init(&bme280_devs[i],
-                        &bme280_params[i]) < 0) {
-            LOG_ERROR("Unable to initialize BME280 sensor #%i\n", i);
-        }
-    }
 }
 
 /*
@@ -280,7 +265,7 @@ static int read_calibration_data(bme280_t* dev)
     uint8_t offset = 0x88;
 
     memset(buffer, 0, sizeof(buffer));
-    nr_bytes = i2c_read_regs(dev->settings.i2c_dev, dev->settings.i2c_addr, offset,
+    nr_bytes = i2c_read_regs(dev->params.i2c_dev, dev->params.i2c_addr, offset,
                              buffer, nr_bytes_to_read);
     if (nr_bytes != nr_bytes_to_read) {
         LOG_ERROR("Unable to read calibration data\n");
@@ -315,14 +300,14 @@ static int read_calibration_data(bme280_t* dev)
     DEBUG("[INFO] Chip ID = 0x%02X\n", buffer[BME280_CHIP_ID_REG - offset]);
 
     /* Config is only be writeable in sleep mode */
-    (void)i2c_write_reg(dev->settings.i2c_dev, dev->settings.i2c_addr,
+    (void)i2c_write_reg(dev->params.i2c_dev, dev->params.i2c_addr,
                         BME280_CTRL_MEAS_REG, 0);
 
     uint8_t b;
 
     /* Config Register */
     /* spi3w_en unused */
-    b = ((dev->settings.t_sb & 7) << 5) | ((dev->settings.filter & 7) << 2);
+    b = ((dev->params.t_sb & 7) << 5) | ((dev->params.filter & 7) << 2);
     write_u8_reg(dev, BME280_CONFIG_REG, b);
 
     /*
@@ -330,12 +315,12 @@ static int read_calibration_data(bme280_t* dev)
      * after a write operation to "ctrl_meas".
      * So, set ctrl_hum first.
      */
-    b = dev->settings.humidOverSample & 7;
+    b = dev->params.humidOverSample & 7;
     write_u8_reg(dev, BME280_CTRL_HUMIDITY_REG, b);
 
-    b = ((dev->settings.tempOverSample & 7) << 5) |
-        ((dev->settings.pressOverSample & 7) << 2) |
-        (dev->settings.runMode & 3);
+    b = ((dev->params.tempOverSample & 7) << 5) |
+        ((dev->params.pressOverSample & 7) << 2) |
+        (dev->params.runMode & 3);
     write_u8_reg(dev, BME280_CTRL_MEAS_REG, b);
 
     return 0;
@@ -353,10 +338,10 @@ static int do_measurement(bme280_t* dev)
      */
     uint8_t ctrl_meas = get_ctrl_meas(dev);
     uint8_t runMode = ctrl_meas & 3;
-    if (runMode != dev->settings.runMode) {
+    if (runMode != dev->params.runMode) {
         /* Set the runMode back to what we want. */
         ctrl_meas &= ~3;
-        ctrl_meas |= dev->settings.runMode;
+        ctrl_meas |= dev->params.runMode;
         write_u8_reg(dev, BME280_CTRL_MEAS_REG, ctrl_meas);
 
         /* Wait for measurement ready? */
@@ -370,7 +355,7 @@ static int do_measurement(bme280_t* dev)
     int nr_bytes_to_read = sizeof(measurement_regs);
     uint8_t offset = BME280_PRESSURE_MSB_REG;
 
-    nr_bytes = i2c_read_regs(dev->settings.i2c_dev, dev->settings.i2c_addr,
+    nr_bytes = i2c_read_regs(dev->params.i2c_dev, dev->params.i2c_addr,
                              offset, measurement_regs, nr_bytes_to_read);
     if (nr_bytes != nr_bytes_to_read) {
         LOG_ERROR("Unable to read temperature data\n");
@@ -395,14 +380,14 @@ static uint8_t read_u8_reg(bme280_t* dev, uint8_t offset)
 {
     uint8_t b;
     /* Assuming device is correct, it should return 1 (nr bytes) */
-    (void)i2c_read_reg(dev->settings.i2c_dev, dev->settings.i2c_addr, offset, &b);
+    (void)i2c_read_reg(dev->params.i2c_dev, dev->params.i2c_addr, offset, &b);
     return b;
 }
 
 static void write_u8_reg(bme280_t* dev, uint8_t offset, uint8_t b)
 {
     /* Assuming device is correct, it should return 1 (nr bytes) */
-    (void)i2c_write_reg(dev->settings.i2c_dev, dev->settings.i2c_addr, offset, b);
+    (void)i2c_write_reg(dev->params.i2c_dev, dev->params.i2c_addr, offset, b);
 }
 
 static uint16_t get_uint16_le(const uint8_t *buffer, size_t offset)

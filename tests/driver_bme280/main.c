@@ -22,29 +22,27 @@
 #ifndef TEST_I2C
 #error "TEST_I2C not defined"
 #endif
-
-#ifndef TEST_MEASURE_OVERSAMPLING
-#error "TEST_MEASURE_OVERSAMPLING not defined"
+#ifndef TEST_I2C_ADDR
+#error "TEST_I2C_ADDR not defined"
 #endif
-
-#ifndef TEST_ALTITUDE
-#error "TEST_ALTITUDE not defined"
-#endif
+#define BME280_PARAM_I2C_DEV    TEST_I2C
+#define BME280_PARAM_I2C_ADDR   TEST_I2C_ADDR
 
 #include <stdio.h>
 #include <inttypes.h>
 
+#include "bme280_params.h"
 #include "bme280.h"
 #include "xtimer.h"
 #include "board.h"
 
-#define SLEEP_2S   (2 * 1000 * 1000u) /* 2 seconds delay between printf */
+#define MAINLOOP_DELAY  (2 * 1000 * 1000u)      /* 2 seconds delay between printf's */
 
 int main(void)
 {
     bme280_t dev;
-#if 1
-    /* Wheather monitoring */
+#if 0
+    /* Weather monitoring */
     bme280_settings_t settings = {
         .i2c_dev = TEST_I2C,
         .i2c_addr = TEST_I2C_ADDR,
@@ -59,14 +57,12 @@ int main(void)
     int16_t temperature;
     uint32_t pressure;
     uint16_t humidity;
-    //float altitude;
-    //float pressure_0;
     int result;
 
     puts("BME280 test application\n");
 
     printf("+------------Initializing------------+\n");
-    result = bme280_init(&dev, &settings);
+    result = bme280_init(&dev, &bme280_params[0]);
     if (result == -1) {
         puts("[Error] The given i2c is not enabled");
         return 1;
@@ -79,7 +75,7 @@ int main(void)
 
     printf("Initialization successful\n\n");
 
-    printf("+------------Calibration------------+\n");
+    printf("+------------Calibration Data------------+\n");
     printf("dig_T1: %u\n", dev.calibration.dig_T1);
     printf("dig_T2: %i\n", dev.calibration.dig_T2);
     printf("dig_T3: %i\n", dev.calibration.dig_T3);
@@ -103,7 +99,7 @@ int main(void)
 
     printf("\n+--------Starting Measurements--------+\n");
     while (1) {
-        /* Get temperature in centi degrees celsius */
+        /* Get temperature in centi degrees Celsius */
         temperature = bme280_read_temperature(&dev);
 
         /* Get pressure in Pa */
@@ -112,12 +108,6 @@ int main(void)
         /* Get pressure in %rH */
         humidity = bme280_read_humidity(&dev);
 
-        /* Get pressure at sealevel in Pa */
-        //bme280_sealevel_pressure(&dev, (int32_t)TEST_ALTITUDE, &pressure_0);
-
-        /* Get altitude in meters */
-        //bme280_altitude(&dev, pressure_0, &altitude);
-
         printf("Temperature [°C]: %d.%d\n"
                "Pressure [Pa]: %ld\n"
                "Humidity [%%rH]: %u.%02u\n"
@@ -125,7 +115,8 @@ int main(void)
                temperature / 100, (temperature % 100) / 10,
 	       (unsigned long)pressure,
                (unsigned int)(humidity / 100), (unsigned int)(humidity % 100));
-        xtimer_usleep(SLEEP_2S);
+
+        xtimer_usleep(MAINLOOP_DELAY);
     }
 
     return 0;
