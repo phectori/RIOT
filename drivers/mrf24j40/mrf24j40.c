@@ -39,9 +39,6 @@ void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
     netdev->driver = &mrf24j40_driver;
     /* initialize device descriptor */
     memcpy(&dev->params, params, sizeof(mrf24j40_params_t));
-    dev->idle_state = MRF24J40_PSEUDO_STATE_RX_AACK_ON;
-    dev->state = MRF24J40_PSEUDO_STATE_SLEEP;
-    dev->pending_tx = 0;
     /* initialise SPI */
     spi_init_master(dev->params.spi, SPI_CONF_FIRST_RISING, params->spi_speed);
 
@@ -92,7 +89,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
     mrf24j40_set_pan(dev, MRF24J40_DEFAULT_PANID);
 
     /* configure Immediate Sleep and Wake-Up mode */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_MASK__IMMWAKE);            /* enable Immediate Wake-up mode */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);            /* enable Immediate Wake-up mode */
 
     /* set default options */
     mrf24j40_set_option(dev, IEEE802154_FCF_PAN_COMP, true);
@@ -113,7 +110,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
 #endif
 
     /* go into RX state */
-    mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_RX_AACK_ON);
+    mrf24j40_reset_tasks(dev);
     DEBUG("mrf24j40_reset(): reset complete.\n");
 }
 
@@ -127,11 +124,11 @@ bool mrf24j40_cca(mrf24j40_t *dev)
 
     /* trigger CCA measurment */
     /* take a look onto datasheet chapter 3.6.1 */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_MASK__RSSIMODE1);
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_RSSIMODE1);
     /* wait for result to be ready */
     do {
         status = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG6);
-    } while (!(status & MRF24J40_BBREG2_MASK__RSSIRDY));
+    } while (!(status & MRF24J40_BBREG2_RSSIRDY));
     /* return according to measurement */
     tmp_ccaedth = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);       /* Energy detection threshold */
     tmp_rssi = mrf24j40_reg_read_long(dev, MRF24J40_REG_RSSI);
@@ -145,35 +142,15 @@ bool mrf24j40_cca(mrf24j40_t *dev)
     }
 }
 
-size_t mrf24j40_send(mrf24j40_t *dev, uint8_t *data, size_t len)
-{
-    /* check data length */
-    if (len > MRF24J40_MAX_PKT_LENGTH) {
-        DEBUG("[mrf24j40] Error: data to send exceeds max packet size\n");
-        return 0;
-    }
-    mrf24j40_tx_prepare(dev);
-    mrf24j40_tx_load(dev, data, len, 0);
-    mrf24j40_tx_exec(dev);
-    return len;
-}
-
 void mrf24j40_tx_prepare(mrf24j40_t *dev)
 {
-    uint8_t state;
+    /* check */
+    DEBUG("[mrf24j40] TX_Prepare, Current: %x\n", dev->state);
 
-    dev->pending_tx++;
-
-    /* make sure ongoing transmissions are finished */
     do {
-        state = mrf24j40_get_status(dev);
-    } while (state == MRF24J40_PSEUDO_STATE_BUSY_RX_AACK ||
-             state == MRF24J40_PSEUDO_STATE_BUSY_TX_ARET);
-
-    if (state != MRF24J40_PSEUDO_STATE_TX_ARET_ON) {
-        dev->idle_state = state;
-    }
-    mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_TX_ARET_ON);
+        mrf24j40_update_tasks(dev);
+    } while(!(dev->pending & MRF24J40_TASK_TX_DONE));
+    dev->pending &= ~(MRF24J40_TASK_TX_DONE);
     dev->tx_frame_len = IEEE802154_FCS_LEN;
 }
 
@@ -202,12 +179,8 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
     mrf24j40_reg_write_long(dev, MRF24J40_TX_NORMAL_FIFO, dev->header_len);
 
     /* trigger sending of pre-loaded frame */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x5);  //transmit packet with ACK requested
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x1);  //transmit packet with ACK requested
     if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
     }
 }
-
-
-
-

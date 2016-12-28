@@ -69,16 +69,6 @@ void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t
 
 
 /**
- * @brief   Convenience function for reading the status of the given device
- *
- * @param[in] dev       device to read the status from
- *
- * @return              internal status of the given device
- */
-uint8_t mrf24j40_get_status(mrf24j40_t *dev);
-
-
-/**
  * @brief   Read a chunk of data from the TX Normal FIFO area of the given device
  *
  * @param[in]  dev      device to read from
@@ -144,7 +134,9 @@ void mrf24j40_assert_awake(mrf24j40_t *dev);
  */
 void mrf24j40_assert_sleep(mrf24j40_t *dev);
 
+void mrf24j40_reset_tasks(mrf24j40_t *dev);
 
+void mrf24j40_update_tasks(mrf24j40_t *dev);
 /**
  * @brief   Trigger a hardware reset
  *

@@ -19,6 +19,7 @@
  * @brief       Interface definition for MRF24J40 based drivers
  *
  * @author      neo@nenaco.de
+ * @author      koen@bergzand.net
  */
 
 #ifndef MRF24J40_H_
@@ -113,16 +114,10 @@ extern "C" {
  * @brief   Flags for PSEUDO DEVICE INTERNAL STATES
  * @{
  */
-#define MRF24J40_PSEUDO_STATE_TRX_OFF      (0x08)       /**< idle */
-#define MRF24J40_PSEUDO_STATE_RX_ON        (0x06)
-#define MRF24J40_PSEUDO_STATE_PLL_ON       (0x09)       /**< ready to transmit */
-#define MRF24J40_PSEUDO_STATE_SLEEP        (0x0f)       /**< sleep mode */
-#define MRF24J40_PSEUDO_STATE_BUSY_RX_AACK (0x11)       /**< busy receiving data */
-#define MRF24J40_PSEUDO_STATE_BUSY_TX_ARET (0x12)       /**< busy transmitting data */
-#define MRF24J40_PSEUDO_STATE_RX_AACK_ON   (0x16)       /**< wait for incoming data */
-#define MRF24J40_PSEUDO_STATE_TX_ARET_ON   (0x19)       /**< ready for sending data */
-#define MRF24J40_PSEUDO_STATE_TX_ARET_OFF  (0x19)       /**< ready for sending data */
-#define MRF24J40_PSEUDO_STATE_IN_PROGRESS  (0x1f)       /**< ongoing state conversion */
+#define MRF24J40_PSEUDO_STATE_OFF      (0x01)       /**< OFF */
+#define MRF24J40_PSEUDO_STATE_SLEEP        (0x02)       /**< sleep mode */
+#define MRF24J40_PSEUDO_STATE_PLL_ON       (0x04)       /**< ready to transmit */
+#define MRF24J40_PSEUDO_STATE_RX           (0x08)       /**< wait for incoming data */
 /** @} */
 
 /**
@@ -149,7 +144,15 @@ extern "C" {
                                                                          *   start */
 #define MRF24J40_OPT_TELL_RX_END    (0x4000)                            /**< notify MAC layer on RX
                                                                          *   finished */
+#define MRF24J40_OPT_REQ_AUTO_ACK    (0x8000)                            /**< notify MAC layer on RX
+                                                                         *   finished */
 /** @} */
+
+
+#define MRF24J40_TASK_TX_DONE           (0x01)
+#define MRF24J40_TASK_TX_READY          (0x02)
+#define MRF24J40_TASK_RX_READY          (0x04)
+
 
 /**
  * @brief struct holding all params needed for device initialization
@@ -174,12 +177,11 @@ typedef struct {
      */
     mrf24j40_params_t params;               /**< parameters for initialization */
     uint8_t state;                          /**< current state of the radio */
-    uint8_t tx_frame_len;                   /**< length of the current TX frame */
     uint8_t idle_state;                     /**< state to return to after sending */
-    uint8_t pending_tx;                     /**< keep track of pending TX calls
-                                               this is required to know when to
-                                               return to @ref mrf24j40_t::idle_state */
+    uint8_t tx_frame_len;                   /**< length of the current TX frame */
     uint8_t header_len;
+    uint8_t pending;                        /**< Flags for pending tasks */
+    uint8_t irq_flag;
 } mrf24j40_t;
 
 /**
