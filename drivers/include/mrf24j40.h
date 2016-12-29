@@ -423,6 +423,14 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state);
  */
 void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state);
 
+
+/**
+ * @brief   Wake up from sleep mode
+ *
+ * @param[in] dev       device to eventually wake up
+ */
+void mrf24j40_assert_awake(mrf24j40_t *dev);
+
 /**
  * @brief   Reset the internal state machine to TRX_OFF mode.
  *

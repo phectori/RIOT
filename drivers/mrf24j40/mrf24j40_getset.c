@@ -458,6 +458,25 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     }
 }
 
+void mrf24j40_assert_awake(mrf24j40_t *dev)
+{
+    if (dev->state == MRF24J40_PSEUDO_STATE_SLEEP) {
+        DEBUG("[mrf24j40] Waking up\n");
+
+        /* Wake mrf up */
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE | MRF24J40_WAKECON_REGWAKE);
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);
+
+        /* reset state machine */
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
+
+        /* After wake-up, delay at least 2 ms to allow 20 MHz main
+         * oscillator time to stabilize before transmitting or receiving.
+         */
+        xtimer_usleep(MRF24J40_WAKEUP_DELAY);
+    }
+}
 
 void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {

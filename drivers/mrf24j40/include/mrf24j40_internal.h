@@ -119,13 +119,6 @@ void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_
 uint8_t mrf24j40_get_status(mrf24j40_t *dev);
 
 
-/**
- * @brief   Wake up from sleep mode
- *
- * @param[in] dev       device to eventually wake up
- */
-void mrf24j40_assert_awake(mrf24j40_t *dev);
-
 
 /**
  * @brief   Set device to sleep mode

@@ -194,26 +194,6 @@ void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_
     }
 }
 
-
-void mrf24j40_assert_awake(mrf24j40_t *dev)
-{
-    if (dev->state == MRF24J40_PSEUDO_STATE_SLEEP) {
-        DEBUG("[mrf24j40] Waking up\n");
-
-        /* set uController pin to high */
-        gpio_set(dev->params.sleep_pin);
-
-        /* reset state machine */
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
-
-        /* After wake-up, delay at least 2 ms to allow 20 MHz main
-         * oscillator time to stabilize before transmitting or receiving.
-         */
-        xtimer_usleep(MRF24J40_WAKEUP_DELAY);
-    }
-}
-
 void mrf24j40_update_int_status(mrf24j40_t *dev)
 {
     uint8_t instat = 0;
