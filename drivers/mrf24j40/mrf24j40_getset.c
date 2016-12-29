@@ -66,10 +66,10 @@ static const int16_t tx_pow_to_dbm[] = { 0, 0, -1, -2, -3, -4, -5, -6,
                                          -20, -20, -21, -22, -23, -24, -25, -26,
                                          -30, -30, -31, -32, -33, -34, -35, -36 };
 
-static const uint8_t dbm_to_tx_pow[] = { 0xf8, 0xf0, 0xe8, 0xe0, 0xd8, 0xd0, 0xc8, 0xc0,
-                                         0xb8, 0xb0, 0xa8, 0xa8, 0x98, 0x90, 0x88, 0x80,
-                                         0x78, 0x70, 0x68, 0x60, 0x58, 0x50, 0x48, 0x40,
-                                         0x38, 0x30, 0x28, 0x20, 0x18, 0x10, 0x08, 0x00 };
+static const uint8_t dbm_to_tx_pow[] = { 0x00, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x38, 0x38, 0x40, 
+                                         0x40, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78, 0x78, 0x78, 0x80,
+                                         0x80, 0x90, 0x98, 0xa0, 0xa8, 0xb0, 0xb8, 0xb8, 0xb8, 0xc0,
+                                         0xc0, 0xd0, 0xd8, 0xe0, 0xe8, 0xf0, 0xf8 };
 
 /* take a look onto datasheet table 3-8 */
 static const int8_t dBm_value[] = {  95, 89, 88, 88, 87, 87, 87, 87, \
@@ -262,14 +262,16 @@ int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
 {
     uint8_t txpower;
 
-    txpower = mrf24j40_reg_read_long(dev, MRF24J40_REG_RFCON3);
+    txpower = (mrf24j40_reg_read_long(dev, MRF24J40_REG_RFCON3) >> 3) & 0x1F;
     return tx_pow_to_dbm[txpower];
 }
 
 void mrf24j40_set_txpower(mrf24j40_t *dev, int16_t txpower)
 {
     uint8_t txpower_reg_value;
-
+    /* positive values are better with a conversion array */
+    txpower = (txpower < 0) ? -1 * txpower : txpower;
+    txpower = (txpower > 36) ? 36 : txpower;
     txpower_reg_value = dbm_to_tx_pow[txpower];
 
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON3, txpower_reg_value);
