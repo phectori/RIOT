@@ -303,6 +303,14 @@ uint8_t mrf24j40_get_csma_max_retries(mrf24j40_t *dev)
 
 void mrf24j40_set_csma_max_retries(mrf24j40_t *dev, int8_t retries)
 {
+    uint8_t tmp;
+    /* get current register settings */
+    tmp  = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
+    /* clear csma bits */
+    tmp  &= ~(0x7);
+    /* apply new settings */
+    tmp  |= (retries & 0x07);
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp);
 }
 
 void mrf24j40_set_csma_backoff_exp(mrf24j40_t *dev, uint8_t min, uint8_t max)
