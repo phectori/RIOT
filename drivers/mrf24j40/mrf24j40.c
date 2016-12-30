@@ -87,6 +87,7 @@ void mrf24j40_reset(mrf24j40_t *dev)
 #endif
     /* set default PAN id */
     mrf24j40_set_pan(dev, MRF24J40_DEFAULT_PANID);
+    mrf24j40_set_chan(dev, MRF24J40_DEFAULT_CHANNEL);
 
     /* configure Immediate Sleep and Wake-Up mode */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);            /* enable Immediate Wake-up mode */

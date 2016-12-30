@@ -60,9 +60,6 @@ void mrf24j40_init(mrf24j40_t *dev)
 
     /* set interrupt pin polarity */
     mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON0, MRF24J40_SLPCON0_INTEDGE );        /* IRQ-Pin -> rising edge */
-    /* set default channel */
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON0, 0xf3);        /* Default channel = 26 */
-    /* set default TX power - Reset default = Max -> nothing to do */
     /* reset RF state machine */
     mrf24j40_reset_state_machine(dev);
 

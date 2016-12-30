@@ -403,7 +403,7 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             else {
                 uint8_t page = ((uint8_t *)val)[0];
 
-                /* rf23x only supports page 0, no need to configure anything in the driver. */
+                /* mrf24j40 only supports page 0, no need to configure anything in the driver. */
                 if (page != 0) {
                     res = -EINVAL;
                 }
