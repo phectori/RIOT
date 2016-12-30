@@ -437,16 +437,6 @@ static int _set(netdev2_t *netdev, netopt_t opt, void *val, size_t len)
             /* don't set res to set netdev2_ieee802154_t::flags */
             break;
 
-        case NETOPT_RETRANS:
-            if (len > sizeof(uint8_t)) {
-                res = -EOVERFLOW;
-            }
-            else {
-                mrf24j40_set_max_retries(dev, *((uint8_t *)val));
-                res = sizeof(uint8_t);
-            }
-            break;
-
         case NETOPT_PRELOADING:
             mrf24j40_set_option(dev, MRF24J40_OPT_PRELOADING,
                                 ((bool *)val)[0]);

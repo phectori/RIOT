@@ -280,16 +280,7 @@ void mrf24j40_set_txpower(mrf24j40_t *dev, int16_t txpower)
 
 uint8_t mrf24j40_get_max_retries(mrf24j40_t *dev)
 {
-    return (mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT) >> 6);
-}
-
-void mrf24j40_set_max_retries(mrf24j40_t *dev, uint8_t max)
-{
-    max = (max > 3) ? 3 : max;
-    uint8_t tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
-    tmp &= ~(MRF24J40_TXSTAT_MAX_FRAME_RETRIES);
-    tmp |= (max << 6);
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXSTAT, tmp);
+    return MRF24J40_MAX_FRAME_RETRIES;
 }
 
 uint8_t mrf24j40_get_csma_max_retries(mrf24j40_t *dev)

@@ -153,6 +153,7 @@ extern "C" {
 #define MRF24J40_TASK_TX_READY          (0x02)
 #define MRF24J40_TASK_RX_READY          (0x04)
 
+#define MRF24J40_MAX_FRAME_RETRIES          (3U)
 
 /**
  * @brief struct holding all params needed for device initialization
