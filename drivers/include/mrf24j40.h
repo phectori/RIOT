@@ -41,7 +41,7 @@ extern "C" {
 /**
  * @brief   Maximum possible packet size in byte
  */
-#define MRF24J40_MAX_PKT_LENGTH        (127)
+#define MRF24J40_MAX_PKT_LENGTH        (IEEE802154_FRAME_LEN_MAX)
 
 /**
  * @brief   Default addresses used if the CPUID module is not present
@@ -55,9 +55,9 @@ extern "C" {
  * @brief   Channel configuration
  * @{
  */
-#define MRF24J40_MIN_CHANNEL           (11U)
-#define MRF24J40_MAX_CHANNEL           (26U)
-#define MRF24J40_DEFAULT_CHANNEL       (26U)
+#define MRF24J40_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
+#define MRF24J40_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
+#define MRF24J40_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_CHANNEL)
 /** @} */
 
 /**
@@ -65,7 +65,7 @@ extern "C" {
  *
  * @todo    Read some global network stack specific configuration value
  */
-#define MRF24J40_DEFAULT_PANID         (0x0023)
+#define MRF24J40_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief   Default TX power (0dBm)
@@ -103,7 +103,7 @@ extern "C" {
  *  31 -> -0dB
  */
 
-#define MRF24J40_DEFAULT_TXPOWER       (31U)
+#define MRF24J40_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
 
 /**
  * @brief   Base (minimal) RSSI value in dBm
