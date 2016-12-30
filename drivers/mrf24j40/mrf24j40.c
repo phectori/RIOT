@@ -167,6 +167,7 @@ size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len, size_t offse
 void mrf24j40_tx_exec(mrf24j40_t *dev)
 {
     netdev2_t *netdev = (netdev2_t *)dev;
+    
 
     dev->tx_frame_len = dev->tx_frame_len - IEEE802154_FCS_LEN;
     /* write frame length field in FIFO */
@@ -180,7 +181,13 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
     mrf24j40_reg_write_long(dev, MRF24J40_TX_NORMAL_FIFO, dev->header_len);
 
     /* trigger sending of pre-loaded frame */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x1);  //transmit packet with ACK requested
+    if (dev->netdev.flags & NETDEV2_IEEE802154_ACK_REQ) {
+         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x5);  //transmit packet with ACK requested
+    }
+    else 
+    {
+         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x1);  //transmit packet without ACK requested
+    }
     if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);
     }
