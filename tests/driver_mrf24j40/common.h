@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Martine Lenders <mlenders@inf.fu-berlin.de>
+ * Copyright (C) 2016 Frits Kuipers <frits.kuipers@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,9 +11,10 @@
  * @{
  *
  * @file
- * @brief   Common header for at86rf2xx tests
+ * @brief   Common header for mrf24j40 tests
  *
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
+ * @author  Frits Kuipers <frits.kuipers@gmail.com>
  */
 #ifndef COMMON_H_
 #define COMMON_H_
@@ -29,7 +30,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Application-internal functions and variables for at86rf2xx tests
+ * @brief   Application-internal functions and variables for mrf24j40 tests
  * @internal
  * @{
  */

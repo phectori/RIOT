@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Freie Universität Berlin
+ * Copyright (C) 2016 Frits Kuipers <frits.kuipers@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +14,7 @@
  * @brief       Test application for mrf24j40 network device driver
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Frits Kuipers <frits.kuipers@gmail.com>
  *
  * @}
  */
