@@ -57,24 +57,20 @@ void mrf24j40_init(mrf24j40_t *dev)
     mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, 0x60);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_RSSIMODE2 );
 
+    /* Enable immediate sleep mode */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);
 
     /* set interrupt pin polarity */
     mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON0, MRF24J40_SLPCON0_INTEDGE );        /* IRQ-Pin -> rising edge */
     /* reset RF state machine */
     mrf24j40_reset_state_machine(dev);
 
+    /* clear interrupts */
+    mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
+
     /* mrf24j40_set_interrupts */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, ~( MRF24J40_INTCON_RXIE | MRF24J40_INTCON_TXNIE ));
     //Wait until the RFSTATE machine indicates RX state
-}
-
-void mrf24j40_reg_write_short(mrf24j40_t *dev, const uint8_t addr, const uint8_t value)
-{
-    spi_acquire(dev->params.spi);
-    gpio_clear(dev->params.cs_pin);
-    spi_transfer_reg(dev->params.spi, MRF24J40_SHORT_ADDR_TRANS | (addr << MRF24J40_ADDR_OFFSET) | MRF24J40_ACCESS_WRITE, value, 0);
-    gpio_set(dev->params.cs_pin);
-    spi_release(dev->params.spi);
 }
 
 uint8_t mrf24j40_reg_read_short(mrf24j40_t *dev, const uint8_t addr)
@@ -90,22 +86,14 @@ uint8_t mrf24j40_reg_read_short(mrf24j40_t *dev, const uint8_t addr)
     return (uint8_t)value;
 }
 
-
-void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t value)
+void mrf24j40_reg_write_short(mrf24j40_t *dev, const uint8_t addr, const uint8_t value)
 {
-    uint8_t reg1, reg2;
-
-    reg1 = MRF24J40_LONG_ADDR_TRANS | (addr >> 3);
-    reg2 = (addr << 5) | MRF24J40_ACCESS_WRITE_LNG;
     spi_acquire(dev->params.spi);
     gpio_clear(dev->params.cs_pin);
-    spi_transfer_byte(dev->params.spi, reg1, 0);
-    spi_transfer_byte(dev->params.spi, reg2, 0);
-    spi_transfer_byte(dev->params.spi, value, 0);
+    spi_transfer_reg(dev->params.spi, MRF24J40_SHORT_ADDR_TRANS | (addr << MRF24J40_ADDR_OFFSET) | MRF24J40_ACCESS_WRITE, value, 0);
     gpio_set(dev->params.cs_pin);
     spi_release(dev->params.spi);
 }
-
 
 uint8_t mrf24j40_reg_read_long(mrf24j40_t *dev, const uint16_t addr)
 {
@@ -125,6 +113,21 @@ uint8_t mrf24j40_reg_read_long(mrf24j40_t *dev, const uint16_t addr)
     return (uint8_t)value;
 }
 
+void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t value)
+{
+    uint8_t reg1, reg2;
+
+    reg1 = MRF24J40_LONG_ADDR_TRANS | (addr >> 3);
+    reg2 = (addr << 5) | MRF24J40_ACCESS_WRITE_LNG;
+    spi_acquire(dev->params.spi);
+    gpio_clear(dev->params.cs_pin);
+    spi_transfer_byte(dev->params.spi, reg1, 0);
+    spi_transfer_byte(dev->params.spi, reg2, 0);
+    spi_transfer_byte(dev->params.spi, value, 0);
+    gpio_set(dev->params.cs_pin);
+    spi_release(dev->params.spi);
+}
+
 void mrf24j40_tx_normal_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data, const size_t len)
 {
     uint8_t reg1, reg2;
@@ -139,7 +142,6 @@ void mrf24j40_tx_normal_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_
     gpio_set(dev->params.cs_pin);
     spi_release(dev->params.spi);
 }
-
 
 void mrf24j40_tx_normal_fifo_write(mrf24j40_t *dev,
                                    const uint16_t offset,
@@ -191,22 +193,6 @@ void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_
     }
 }
 
-void mrf24j40_update_int_status(mrf24j40_t *dev)
-{
-    uint8_t instat = 0;
-    uint8_t newpending = 0;
-    instat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
-    /* check if TX done */
-    if(instat & MRF24J40_INTSTAT_TXNIF){
-        newpending |= MRF24J40_TASK_TX_DONE |MRF24J40_TASK_TX_READY;
-    }
-    if(instat & MRF24J40_INTSTAT_RXIF){
-        newpending |= MRF24J40_TASK_RX_READY;
-    }
-    /* check if RX pending */
-    dev->pending |= newpending;
-}
-
 void mrf24j40_reset_tasks(mrf24j40_t *dev)
 {
     dev->pending = MRF24J40_TASK_TX_DONE;
@@ -214,9 +200,22 @@ void mrf24j40_reset_tasks(mrf24j40_t *dev)
 
 void mrf24j40_update_tasks(mrf24j40_t *dev)
 {
+    uint8_t instat = 0;
+    uint8_t newpending = 0;
     if(dev->irq_flag){
         dev->irq_flag = 0;
-        mrf24j40_update_int_status(dev);
+        instat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
+        /* check if TX done */
+        if(instat & MRF24J40_INTSTAT_TXNIF){
+            newpending |= MRF24J40_TASK_TX_DONE |MRF24J40_TASK_TX_READY;
+            /* transmit done, returning to configured idle state */
+            mrf24j40_assert_sleep(dev);
+        }
+        if(instat & MRF24J40_INTSTAT_RXIF){
+            newpending |= MRF24J40_TASK_RX_READY;
+        }
+        /* check if RX pending */
+        dev->pending |= newpending;
     }
 }
 
@@ -232,26 +231,3 @@ void mrf24j40_hardware_reset(mrf24j40_t *dev)
     gpio_set(dev->params.reset_pin);
     xtimer_usleep(MRF24J40_RESET_DELAY);        /* Datasheet - MRF24J40 ~2ms */
 }
-
-/* read TX Normal FIFO
- */
-void mrf24j40_print_tx_norm_buf(mrf24j40_t *dev)
-{
-    uint8_t k; /* Loop counter for Long Address Registers */
-
-    for (k = 0x0; k <= 0x07f; k++) {
-//		lng_sendbuf[k] = mrf24j40_reg_read_long(&mrf24j40_devs[0], k);
-        printf("mrf24j40_print_tx_norm_buf : transmitbuf[%x]= 0x%x = %c\n", (int)k, (int)mrf24j40_reg_read_long(dev, k), (int)mrf24j40_reg_read_long(dev, k));
-    }
-}
-
-/* read RX FIFO */
-void mrf24j40_print_rx_buf(mrf24j40_t *dev)
-{
-    uint16_t k; /* Loop-Counter for Long-Address-Registers */
-
-    for (k = 0x300; k <= 0x37f; k++) {
-        printf("mrf24j40_print_rx_buf : receive-buf[%d][0x%x] = %d / 0x%x = %c\n", (int)(k - 0x300), (int)(k - 0x300), (int)mrf24j40_reg_read_long(dev, k), (int)mrf24j40_reg_read_long(dev, k), (int)mrf24j40_reg_read_long(dev, k));
-    }
-}
-

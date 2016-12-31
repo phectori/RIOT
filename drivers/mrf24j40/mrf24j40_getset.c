@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Hochschule für Angewandte Wissenschaften
+ * Copyright (C) 2016 Koen Zandberg <koen@bergzand.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,7 +13,7 @@
  * @file
  * @brief       Getter and setter functions for the MRF24J40 drivers
  *
- * @author      Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
+ * @author      Koen Zandberg <koen@bergzand.net>
  *
  * @}
  */
@@ -23,7 +23,7 @@
 #include "mrf24j40_registers.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /* Values of RFCON3 - Address: 0x203
@@ -66,7 +66,7 @@ static const int16_t tx_pow_to_dbm[] = { 0, 0, -1, -2, -3, -4, -5, -6,
                                          -20, -20, -21, -22, -23, -24, -25, -26,
                                          -30, -30, -31, -32, -33, -34, -35, -36 };
 
-static const uint8_t dbm_to_tx_pow[] = { 0x00, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x38, 0x38, 0x40, 
+static const uint8_t dbm_to_tx_pow[] = { 0x00, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38, 0x38, 0x38, 0x40,
                                          0x40, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78, 0x78, 0x78, 0x80,
                                          0x80, 0x90, 0x98, 0xa0, 0xa8, 0xb0, 0xb8, 0xb8, 0xb8, 0xc0,
                                          0xc0, 0xd0, 0xd8, 0xe0, 0xe8, 0xf0, 0xf8 };
@@ -107,15 +107,15 @@ static const int8_t dBm_value[] = {  95, 89, 88, 88, 87, 87, 87, 87, \
 
 /* take a look onto datasheet table 3-8 */
 static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-                             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-                             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
-                             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfd, 0xfa, 0xf5, \
-                             0xef, 0xe9, 0xe4, 0xe1, 0xdd, 0xd8, 0xd4, 0xcf, 0xcb, 0xc6, \
-                             0xc1, 0xbc, 0xb7, 0xb0, 0xaa, 0xa5, 0x9f, 0x99, 0x94, 0x8f, \
-                             0x8a, 0x85, 0x81, 0x7d, 0x79, 0x75, 0x6f, 0x6b, 0x64, 0x5f, \
-                             0x59, 0x53, 0x4e, 0x49, 0x44, 0x3f, 0x3a, 0x35, 0x30, 0x2b, \
-                             0x25, 0x20, 0x1b, 0x17, 0x12, 0x0d, 0x09, 0x05, 0x02, 0x01, \
-                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                                      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
+                                      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
+                                      0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfd, 0xfa, 0xf5, \
+                                      0xef, 0xe9, 0xe4, 0xe1, 0xdd, 0xd8, 0xd4, 0xcf, 0xcb, 0xc6, \
+                                      0xc1, 0xbc, 0xb7, 0xb0, 0xaa, 0xa5, 0x9f, 0x99, 0x94, 0x8f, \
+                                      0x8a, 0x85, 0x81, 0x7d, 0x79, 0x75, 0x6f, 0x6b, 0x64, 0x5f, \
+                                      0x59, 0x53, 0x4e, 0x49, 0x44, 0x3f, 0x3a, 0x35, 0x30, 0x2b, \
+                                      0x25, 0x20, 0x1b, 0x17, 0x12, 0x0d, 0x09, 0x05, 0x02, 0x01, \
+                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
@@ -170,8 +170,7 @@ void mrf24j40_set_chan(mrf24j40_t *dev, uint8_t channel)
     uint8_t channel_value;
 
     if ((channel < MRF24J40_MIN_CHANNEL) ||
-        (channel > MRF24J40_MAX_CHANNEL) ||
-        (dev->netdev.chan == channel)) {
+        (channel > MRF24J40_MAX_CHANNEL)) {
         return;
     }
 
@@ -345,10 +344,6 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
 
                 /* Initialize CSMA seed with hardware address */
                 tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
-                tmp &= 0b11100000;
-                tmp |= 0b00011000;
-                tmp |= 0b00000100;
-                tmp &= ~MRF24J40_TXMCR_SLOTTED;
                 tmp &= ~MRF24J40_TXMCR_NOCSMA;
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp);
                 break;
@@ -373,6 +368,7 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 break;
         }
     }
+    /* clear option field */
     else {
         dev->netdev.flags &= ~(option);
         /* trigger option specific actions */
@@ -385,7 +381,6 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
                 /* MACMINBE<1:0>: The minimum value of the backoff exponent
                  * in the CSMA-CA algorithm. Note that if this value is set
                  * to ‘0’, collision avoidance is disabled. */
-                tmp &= ~MRF24J40_TXMCR_MACMINBE;
                 mrf24j40_reg_write_short(dev, MRF24J40_REG_TXMCR, tmp);
 
                 break;
@@ -418,7 +413,6 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)
 void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
 {
     uint8_t old_state;
-    //uint8_t tmp_txncon;
 
     old_state = dev->state;
 
@@ -426,54 +420,57 @@ void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state)
     if (state == old_state) {
         return;
     }
-
-    /* check if we need to wake up from sleep mode */
+    /* check if asked to wake up from sleep mode */
     if (old_state == MRF24J40_PSEUDO_STATE_SLEEP) {
-        DEBUG("[mrf24j40] waking up from sleep mode\n");
         mrf24j40_assert_awake(dev);
     }
-
-    if (state == MRF24J40_PSEUDO_STATE_SLEEP) {     /* Datasheet chapter 3.15.2 IMMEDIATE SLEEP AND WAKE-UP MODE */
-        DEBUG("[mrf24j40] Putting into sleep mode\n");
-
-        /* set sleep/wake-pin on uController to low */
-        gpio_clear(dev->params.sleep_pin);
-
-        /* set sleep/wake pin polarity high on radio chip to high and enable it */
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, 0x60);
-
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);
-
-        /* First force a Power Management Reset */
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, MRF24J40_SOFTRST_RSTPWR);
-
-        /* Discard all IRQ flags, disable IRQ */
-        //mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);         /* clearing IRQ flags */
-        //mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, 0xff);   /* disable IRQs */
-
-        /* Go to SLEEP mode */
-        mrf24j40_reg_write_short(dev, MRF24J40_REG_SLPACK, MRF24J40_SLPACK_SLPACK);
+    if (state == MRF24J40_PSEUDO_STATE_SLEEP) {
+        mrf24j40_sleep(dev);
+    }
+    if (state == MRF24J40_PSEUDO_STATE_IDLE) {
         dev->state = state;
+    }
+    dev->idle_state = state;
+}
+
+void mrf24j40_sleep(mrf24j40_t *dev)
+{
+    DEBUG("[mrf24j40] Putting into sleep mode\n");
+    /* Datasheet chapter 3.15.2 IMMEDIATE SLEEP AND WAKE-UP MODE */
+    /* First force a Power Management Reset */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, MRF24J40_SOFTRST_RSTPWR);
+    /* Go to SLEEP mode */
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_SLPACK, MRF24J40_SLPACK_SLPACK);
+    dev->state = MRF24J40_PSEUDO_STATE_SLEEP;
+}
+
+void mrf24j40_assert_sleep(mrf24j40_t *dev)
+{
+    if (dev->idle_state == MRF24J40_PSEUDO_STATE_SLEEP) {
+        mrf24j40_sleep(dev);
     }
 }
 
 void mrf24j40_assert_awake(mrf24j40_t *dev)
 {
     if (dev->state == MRF24J40_PSEUDO_STATE_SLEEP) {
-        DEBUG("[mrf24j40] Waking up\n");
-
+        DEBUG("[mrf24j40] Waking up from sleep mode\n");
         /* Wake mrf up */
         mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE | MRF24J40_WAKECON_REGWAKE);
+        /* undocumented delay, needed for stable wakeup */
+        xtimer_usleep(50);
         mrf24j40_reg_write_short(dev, MRF24J40_REG_WAKECON, MRF24J40_WAKECON_IMMWAKE);
 
         /* reset state machine */
         mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
         mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
-
         /* After wake-up, delay at least 2 ms to allow 20 MHz main
          * oscillator time to stabilize before transmitting or receiving.
          */
         xtimer_usleep(MRF24J40_WAKEUP_DELAY);
+        /* reset interrupts */
+        mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
+        dev->state = MRF24J40_PSEUDO_STATE_IDLE;
     }
 }
 
@@ -492,7 +489,7 @@ void mrf24j40_software_reset(mrf24j40_t *dev)
 {
     uint8_t softrst;
 
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, 0x7); // from manual
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, 0x7);
     do {
         softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
     } while (softrst != 0);        /* wait until soft-reset has finished */

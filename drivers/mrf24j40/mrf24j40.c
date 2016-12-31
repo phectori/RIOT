@@ -13,6 +13,7 @@
  * @file
  * @brief       Implementation of public functions for MRF24J40 drivers
  *
+ * @author      Koen Zandberg <koen@bergzand.net>
  * @author      <neo@nenaco.de>
  * @author      Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
  *
@@ -29,8 +30,6 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
-uint8_t state;
 
 void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params)
 {
@@ -112,6 +111,8 @@ void mrf24j40_reset(mrf24j40_t *dev)
 
     /* go into RX state */
     mrf24j40_reset_tasks(dev);
+    dev->state = 0;
+    mrf24j40_set_state(dev, MRF24J40_PSEUDO_STATE_IDLE);
     DEBUG("mrf24j40_reset(): reset complete.\n");
 }
 
@@ -130,6 +131,7 @@ bool mrf24j40_cca(mrf24j40_t *dev)
     do {
         status = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG6);
     } while (!(status & MRF24J40_BBREG2_RSSIRDY));
+    mrf24j40_assert_sleep(dev);
     /* return according to measurement */
     tmp_ccaedth = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);       /* Energy detection threshold */
     tmp_rssi = mrf24j40_reg_read_long(dev, MRF24J40_REG_RSSI);
@@ -151,6 +153,7 @@ void mrf24j40_tx_prepare(mrf24j40_t *dev)
     do {
         mrf24j40_update_tasks(dev);
     } while(!(dev->pending & MRF24J40_TASK_TX_DONE));
+    mrf24j40_assert_awake(dev);
     dev->pending &= ~(MRF24J40_TASK_TX_DONE);
     dev->tx_frame_len = IEEE802154_FCS_LEN;
 }
@@ -158,6 +161,7 @@ void mrf24j40_tx_prepare(mrf24j40_t *dev)
 size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len, size_t offset)
 {
 
+    DEBUG("[mrf24j40] TX_load, Current: %x\n", dev->state);
     dev->tx_frame_len += (uint8_t)len;
 
     mrf24j40_tx_normal_fifo_write(dev, MRF24J40_TX_NORMAL_FIFO + offset + 2, data, len);
@@ -167,7 +171,7 @@ size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len, size_t offse
 void mrf24j40_tx_exec(mrf24j40_t *dev)
 {
     netdev2_t *netdev = (netdev2_t *)dev;
-    
+
 
     dev->tx_frame_len = dev->tx_frame_len - IEEE802154_FCS_LEN;
     /* write frame length field in FIFO */
@@ -180,13 +184,12 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
      */
     mrf24j40_reg_write_long(dev, MRF24J40_TX_NORMAL_FIFO, dev->header_len);
 
-    /* trigger sending of pre-loaded frame */
     if (dev->netdev.flags & NETDEV2_IEEE802154_ACK_REQ) {
-         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x5);  //transmit packet with ACK requested
+         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNACKREQ|MRF24J40_TXNCON_TXNTRIG);
     }
-    else 
+    else
     {
-         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, 0x1);  //transmit packet without ACK requested
+         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNTRIG);
     }
     if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);

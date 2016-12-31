@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Hochschule für Angewandte Wissenschaften Hamburg
+ * Copyright (C) 2016 Koen Zandberg <koen@bergzand.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -42,9 +42,6 @@ extern "C" {
 #ifndef MRF24J40_PARAM_INT
 #define MRF24J40_PARAM_INT         (GPIO_PIN(0, 1))
 #endif
-#ifndef MRF24J40_PARAM_SLEEP
-#define MRF24J40_PARAM_SLEEP       (GPIO_PIN(0, 2))
-#endif
 #ifndef MRF24J40_PARAM_RESET
 #define MRF24J40_PARAM_RESET       (GPIO_PIN(0, 3))
 #endif
@@ -53,7 +50,6 @@ extern "C" {
                                      .spi_speed = MRF24J40_PARAM_SPI_SPEED, \
                                      .cs_pin = MRF24J40_PARAM_CS, \
                                      .int_pin = MRF24J40_PARAM_INT, \
-                                     .sleep_pin = MRF24J40_PARAM_SLEEP, \
                                      .reset_pin = MRF24J40_PARAM_RESET }
 /**@}*/
 

@@ -6,7 +6,7 @@
  * @brief Internal interfaces for MRF24J40 drivers
  *
  * @author Tobias Fredersdorf <tobias.fredersdorf@haw-hamburg.de>
- * @author <neo@nenaco.de>
+ * @author Koen Zandberg <koen@bergzand.net>
  */
 
 #ifndef MRF24J40_INTERNAL_H_
@@ -67,7 +67,6 @@ uint8_t mrf24j40_reg_read_long(mrf24j40_t *dev, const uint16_t addr);
 
 void mrf24j40_reg_write_long(mrf24j40_t *dev, const uint16_t addr, const uint8_t value);
 
-
 /**
  * @brief   Read a chunk of data from the TX Normal FIFO area of the given device
  *
@@ -108,59 +107,26 @@ void mrf24j40_rx_fifo_read(mrf24j40_t *dev, const uint16_t offset, uint8_t *data
  */
 void mrf24j40_rx_fifo_write(mrf24j40_t *dev, const uint16_t offset, const uint8_t *data, const size_t len);
 
-
 /**
- * @brief   Convenience function for reading the status of the given device
+ * @brief   Reset the pending task list of a device
  *
- * @param[in] dev       device to read the status from
- *
- * @return              internal status of the given device
+ * @param[in] dev       device to reset tasks of
  */
-uint8_t mrf24j40_get_status(mrf24j40_t *dev);
-
-
-
-/**
- * @brief   Set device to sleep mode
- *
- * @param[in] dev       device to eventually wake up
- */
-void mrf24j40_assert_sleep(mrf24j40_t *dev);
-
 void mrf24j40_reset_tasks(mrf24j40_t *dev);
 
+/**
+ * @brief   Check for pending interrupts and update task list
+ *
+ * @param[in] dev       device to read
+ */
 void mrf24j40_update_tasks(mrf24j40_t *dev);
+
 /**
  * @brief   Trigger a hardware reset
  *
  * @param[in] dev       device to reset
  */
 void mrf24j40_hardware_reset(mrf24j40_t *dev);
-
-
-/**
- * @brief   Test routine to test FIFO values
- *
- * @param[in] dev
- */
-void mrf24j40_print_tx_norm_buf(mrf24j40_t *dev);
-
-
-/**
- * @brief   Test routine to test FIFO values
- *
- * @param[in] dev
- */
-void mrf24j40_print_rx_buf(mrf24j40_t *dev);
-
-
-/**
- * @brief   Set PHY parameters based on channel and page number
- *
- * @param[in] dev       device to configure
- */
-void mrf24j40_configure_phy(mrf24j40_t *dev);
-
 
 #ifdef __cplusplus
 }
