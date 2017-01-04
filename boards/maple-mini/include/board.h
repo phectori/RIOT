@@ -47,6 +47,13 @@ extern "C" {
 #define LED0_TOGGLE         (LED_PORT->ODR ^= LED0_MASK)
 /** @} */
 
+#define MRF24J40_PARAM_SPI         (SPI_0)
+#define MRF24J40_PARAM_SPI_SPEED   (SPI_SPEED_5MHZ)
+#define MRF24J40_PARAM_CS          (GPIO_PIN(0, 1))
+#define MRF24J40_PARAM_INT         (GPIO_PIN(0, 2))
+#define MRF24J40_PARAM_RESET       (GPIO_PIN(0, 3))
+
+
 /**
  * @brief   User button
  */
