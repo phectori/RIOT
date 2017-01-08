@@ -152,7 +152,7 @@ void mrf24j40_tx_prepare(mrf24j40_t *dev)
 
     do {
         mrf24j40_update_tasks(dev);
-    } while(!(dev->pending & MRF24J40_TASK_TX_DONE));
+    } while (!(dev->pending & MRF24J40_TASK_TX_DONE));
     mrf24j40_assert_awake(dev);
     dev->pending &= ~(MRF24J40_TASK_TX_DONE);
     dev->tx_frame_len = IEEE802154_FCS_LEN;
@@ -185,11 +185,10 @@ void mrf24j40_tx_exec(mrf24j40_t *dev)
     mrf24j40_reg_write_long(dev, MRF24J40_TX_NORMAL_FIFO, dev->header_len);
 
     if (dev->netdev.flags & NETDEV2_IEEE802154_ACK_REQ) {
-         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNACKREQ|MRF24J40_TXNCON_TXNTRIG);
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNACKREQ | MRF24J40_TXNCON_TXNTRIG);
     }
-    else
-    {
-         mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNTRIG);
+    else {
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_TXNCON, MRF24J40_TXNCON_TXNTRIG);
     }
     if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV2_EVENT_TX_STARTED);

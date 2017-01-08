@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2017 Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup drivers_mrf24j40
  * @{
@@ -18,7 +26,7 @@ extern "C" {
 
 /**
  * @brief SPI access specifiers
- ****@{
+ *****@{
  */
 #define MRF24J40_SHORT_ADDR_TRANS       (0x00)
 #define MRF24J40_LONG_ADDR_TRANS        (0x80)
@@ -30,7 +38,7 @@ extern "C" {
 
 /**
  * @brief FIFO-Address-Map
- ***@{
+ ****@{
  */
 #define MRF24J40_TX_NORMAL_FIFO         (0x000)
 #define MRF24J40_TX_BEACON_FIFO         (0x080)
@@ -41,7 +49,7 @@ extern "C" {
 
 /**
  * @brief Short-Register addresses
- ****@{
+ *****@{
  */
 #define MRF24J40_REG_RXMCR              (0x00)
 #define MRF24J40_REG_PANIDL             (0x01)
@@ -105,7 +113,7 @@ extern "C" {
 
 /**
  * @brief Long-Register addresses
- ****@{
+ *****@{
  */
 #define MRF24J40_REG_RFCON0             (0x200)
 #define MRF24J40_REG_RFCON1             (0x201)
@@ -436,4 +444,3 @@ extern "C" {
 
 #endif /* MRF24J40_REGISTERS_H */
 /** @} */
-

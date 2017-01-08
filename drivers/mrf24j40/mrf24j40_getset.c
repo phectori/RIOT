@@ -73,37 +73,37 @@ static const uint8_t dbm_to_tx_pow[] = { 0x00, 0x10, 0x18, 0x20, 0x28, 0x30, 0x3
 
 /* take a look onto datasheet table 3-8 */
 static const int8_t dBm_value[] = {  95, 89, 88, 88, 87, 87, 87, 87, \
-                            86, 86, 86, 86, 85, 85, 85, 85, \
-                            84, 84, 84, 84, 84, 84, 83, 83, \
-                            83, 83, 82, 82, 82, 82, 81, 81, \
-                            81, 81, 81, 80, 80, 80, 80, 80, \
-                            80, 79, 79, 79, 79, 79, 78, 78, \
-                            78, 78, 78, 77, 77, 77, 77, 77, \
-                            76, 76, 76, 76, 76, 75, 75, 75, \
-                            75, 75, 75, 74, 74, 74, 74, 73, \
-                            73, 73, 73, 73, 72, 72, 72, 72, \
-                            72, 71, 71, 71, 71, 71, 70, 70, \
-                            70, 70, 70, 70, 70, 69, 69, 69, \
-                            69, 69, 68, 68, 68, 68, 68, 68, \
-                            68, 67, 67, 67, 67, 66, 66, 66, \
-                            66, 66, 66, 65, 65, 65, 65, 65, \
-                            64, 64, 64, 64, 63, 63, 63, 63, \
-                            62, 62, 62, 62, 61, 61, 61, 61, \
-                            60, 60, 60, 60, 60, 59, 59, 59, \
-                            59, 59, 58, 58, 58, 58, 58, 57, \
-                            57, 57, 57, 57, 57, 56, 56, 56, \
-                            56, 56, 56, 56, 55, 55, 55, 55, \
-                            54, 54, 54, 54, 54, 54, 53, 53, \
-                            53, 53, 53, 53, 53, 52, 52, 52, \
-                            52, 52, 52, 51, 51, 51, 51, 51, \
-                            50, 50, 50, 50, 50, 49, 49, 49, \
-                            49, 49, 48, 48, 48, 48, 47, 47, \
-                            47, 47, 47, 46, 46, 46, 46, 45, \
-                            45, 45, 45, 44, 44, 44, 44, 44, \
-                            43, 43, 43, 42, 42, 42, 42, 41, \
-                            41, 41, 41, 41, 41, 40, 40, 40, \
-                            40, 40, 39, 39, 39, 39, 39, 38, \
-                            38, 38, 38, 37, 37, 37, 36, 30 };
+                                     86, 86, 86, 86, 85, 85, 85, 85, \
+                                     84, 84, 84, 84, 84, 84, 83, 83, \
+                                     83, 83, 82, 82, 82, 82, 81, 81, \
+                                     81, 81, 81, 80, 80, 80, 80, 80, \
+                                     80, 79, 79, 79, 79, 79, 78, 78, \
+                                     78, 78, 78, 77, 77, 77, 77, 77, \
+                                     76, 76, 76, 76, 76, 75, 75, 75, \
+                                     75, 75, 75, 74, 74, 74, 74, 73, \
+                                     73, 73, 73, 73, 72, 72, 72, 72, \
+                                     72, 71, 71, 71, 71, 71, 70, 70, \
+                                     70, 70, 70, 70, 70, 69, 69, 69, \
+                                     69, 69, 68, 68, 68, 68, 68, 68, \
+                                     68, 67, 67, 67, 67, 66, 66, 66, \
+                                     66, 66, 66, 65, 65, 65, 65, 65, \
+                                     64, 64, 64, 64, 63, 63, 63, 63, \
+                                     62, 62, 62, 62, 61, 61, 61, 61, \
+                                     60, 60, 60, 60, 60, 59, 59, 59, \
+                                     59, 59, 58, 58, 58, 58, 58, 57, \
+                                     57, 57, 57, 57, 57, 56, 56, 56, \
+                                     56, 56, 56, 56, 55, 55, 55, 55, \
+                                     54, 54, 54, 54, 54, 54, 53, 53, \
+                                     53, 53, 53, 53, 53, 52, 52, 52, \
+                                     52, 52, 52, 51, 51, 51, 51, 51, \
+                                     50, 50, 50, 50, 50, 49, 49, 49, \
+                                     49, 49, 48, 48, 48, 48, 47, 47, \
+                                     47, 47, 47, 46, 46, 46, 46, 45, \
+                                     45, 45, 45, 44, 44, 44, 44, 44, \
+                                     43, 43, 43, 42, 42, 42, 42, 41, \
+                                     41, 41, 41, 41, 41, 40, 40, 40, \
+                                     40, 40, 39, 39, 39, 39, 39, 38, \
+                                     38, 38, 38, 37, 37, 37, 36, 30 };
 
 /* take a look onto datasheet table 3-8 */
 static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, \
@@ -268,6 +268,7 @@ int16_t mrf24j40_get_txpower(mrf24j40_t *dev)
 void mrf24j40_set_txpower(mrf24j40_t *dev, int16_t txpower)
 {
     uint8_t txpower_reg_value;
+
     /* positive values are better with a conversion array */
     txpower = (txpower < 0) ? -1 * txpower : txpower;
     txpower = (txpower > 36) ? 36 : txpower;
@@ -294,6 +295,7 @@ uint8_t mrf24j40_get_csma_max_retries(mrf24j40_t *dev)
 void mrf24j40_set_csma_max_retries(mrf24j40_t *dev, int8_t retries)
 {
     uint8_t tmp;
+
     /* get current register settings */
     tmp  = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXMCR);
     /* clear csma bits */
@@ -311,7 +313,7 @@ int8_t mrf24j40_get_cca_threshold(mrf24j40_t *dev)
 {
     int8_t tmp;
 
-    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);       /* Energy detection threshold */
+    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_CCAEDTH);   /* Energy detection threshold */
 
     return(dBm_value[tmp]);                                     /* in dBm */
 }
@@ -477,6 +479,7 @@ void mrf24j40_assert_awake(mrf24j40_t *dev)
 void mrf24j40_reset_state_machine(mrf24j40_t *dev)
 {
     uint8_t rfstate;
+
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, MRF24J40_RFCTL_RFRST);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RFCTL, 0x00);
     xtimer_usleep(MRF24J40_STATE_RESET_DELAY);             /* Delay at least 192us */
@@ -494,5 +497,3 @@ void mrf24j40_software_reset(mrf24j40_t *dev)
         softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
     } while (softrst != 0);        /* wait until soft-reset has finished */
 }
-
-

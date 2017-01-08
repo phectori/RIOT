@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2017 Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
 /**
  * @ingroup     drivers_mrf24j40
  * @{
@@ -22,6 +30,7 @@ void mrf24j40_init(mrf24j40_t *dev)
 {
     uint8_t softrst;
     uint8_t order;
+
     mrf24j40_hardware_reset(dev);
     /* do a soft reset */
     mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, 0x7); // from manual
@@ -38,21 +47,21 @@ void mrf24j40_init(mrf24j40_t *dev)
     mrf24j40_reg_write_short(dev, MRF24J40_REG_RXFLUSH, MRF24J40_RXFLUSH_RXFLUSH);
 
     /* Here starts init-process as described on MRF24J40 Manual Chap. 3.2 */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_PACON2, 	( MRF24J40_PACON2_TXONTS2 |
-                                                          MRF24J40_PACON2_TXONTS1 |
-                                                          MRF24J40_PACON2_FIFOEN) );
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXSTBL, ( MRF24J40_TXSTBL_RFSTBL3 |
-                                                         MRF24J40_TXSTBL_RFSTBL0 |
-                                                         MRF24J40_TXSTBL_MSIFS2  |
-                                                         MRF24J40_TXSTBL_MSIFS0  ));
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_PACON2,  (MRF24J40_PACON2_TXONTS2 |
+                                                         MRF24J40_PACON2_TXONTS1 |
+                                                         MRF24J40_PACON2_FIFOEN));
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_TXSTBL, (MRF24J40_TXSTBL_RFSTBL3 |
+                                                        MRF24J40_TXSTBL_RFSTBL0 |
+                                                        MRF24J40_TXSTBL_MSIFS2  |
+                                                        MRF24J40_TXSTBL_MSIFS0));
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON1, MRF24J40_RFCON1_VCOOPT1);
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON2, MRF24J40_RFCON2_PLLEN);
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON6, ( MRF24J40_RFCON6_TXFIL |
-                                                        MRF24J40_RFCON6_20MRECVR ));
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON6, (MRF24J40_RFCON6_TXFIL |
+                                                       MRF24J40_RFCON6_20MRECVR));
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON7, MRF24J40_RFCON7_SLPCLKSEL1 );
     mrf24j40_reg_write_long(dev, MRF24J40_REG_RFCON8, MRF24J40_RFCON8_RFVCO );
-    mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON1, ( MRF24J40_SLPCON1_CLKOUTEN |
-                                                         MRF24J40_SLPCON1_SLPCLKDIV0 ));
+    mrf24j40_reg_write_long(dev, MRF24J40_REG_SLPCON1, (MRF24J40_SLPCON1_CLKOUTEN |
+                                                        MRF24J40_SLPCON1_SLPCLKDIV0));
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG2, MRF25J40_BBREG2_CCAMODE1 );
     mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, 0x60);
     mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG6, MRF24J40_BBREG6_RSSIMODE2 );
@@ -69,7 +78,7 @@ void mrf24j40_init(mrf24j40_t *dev)
     mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
 
     /* mrf24j40_set_interrupts */
-    mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, ~( MRF24J40_INTCON_RXIE | MRF24J40_INTCON_TXNIE ));
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_INTCON, ~(MRF24J40_INTCON_RXIE | MRF24J40_INTCON_TXNIE));
     //Wait until the RFSTATE machine indicates RX state
 }
 
@@ -200,18 +209,20 @@ void mrf24j40_reset_tasks(mrf24j40_t *dev)
 
 void mrf24j40_update_tasks(mrf24j40_t *dev)
 {
-    uint8_t instat = 0;
-    uint8_t newpending = 0;
-    if(dev->irq_flag){
+
+    if (dev->irq_flag) {
+        uint8_t newpending = 0;
+        uint8_t instat = 0;
+
         dev->irq_flag = 0;
         instat = mrf24j40_reg_read_short(dev, MRF24J40_REG_INTSTAT);
         /* check if TX done */
-        if(instat & MRF24J40_INTSTAT_TXNIF){
-            newpending |= MRF24J40_TASK_TX_DONE |MRF24J40_TASK_TX_READY;
+        if (instat & MRF24J40_INTSTAT_TXNIF) {
+            newpending |= MRF24J40_TASK_TX_DONE | MRF24J40_TASK_TX_READY;
             /* transmit done, returning to configured idle state */
             mrf24j40_assert_sleep(dev);
         }
-        if(instat & MRF24J40_INTSTAT_RXIF){
+        if (instat & MRF24J40_INTSTAT_RXIF) {
             newpending |= MRF24J40_TASK_RX_READY;
         }
         /* check if RX pending */

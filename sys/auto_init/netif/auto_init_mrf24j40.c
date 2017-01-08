@@ -49,7 +49,7 @@ void auto_init_mrf24j40(void)
         int res;
 
         DEBUG("Initializing MRF24J40 radio at SPI_%i\n", p->spi);
-        mrf24j40_setup(&mrf24j40_devs[i], (mrf24j40_params_t*) p);
+        mrf24j40_setup(&mrf24j40_devs[i], (mrf24j40_params_t *) p);
         res = gnrc_netdev2_ieee802154_init(&gnrc_adpt[i],
                                            (netdev2_ieee802154_t *)&mrf24j40_devs[i]);
 

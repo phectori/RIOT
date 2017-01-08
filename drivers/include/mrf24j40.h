@@ -148,11 +148,11 @@ extern "C" {
 /** @} */
 
 
-#define MRF24J40_TASK_TX_DONE           (0x01)
-#define MRF24J40_TASK_TX_READY          (0x02)
-#define MRF24J40_TASK_RX_READY          (0x04)
+#define MRF24J40_TASK_TX_DONE           (0x01)      /**< TX operation is done */
+#define MRF24J40_TASK_TX_READY          (0x02)      /**< TX operation results ready for processing */
+#define MRF24J40_TASK_RX_READY          (0x04)      /**< RX processing needed */
 
-#define MRF24J40_MAX_FRAME_RETRIES          (3U)
+#define MRF24J40_MAX_FRAME_RETRIES      (3U)        /**< Number of frame retries (fixed) */
 
 /**
  * @brief struct holding all params needed for device initialization
@@ -446,14 +446,6 @@ size_t mrf24j40_tx_load(mrf24j40_t *dev, uint8_t *data, size_t len,
  * @param[in] dev           device to trigger
  */
 void mrf24j40_tx_exec(mrf24j40_t *dev);
-
-/**
- * @brief   Initialize the MRF24J40 Interrupt / Port and Pin of uC
- *
- * @param dev               device to read from
- */
-void init_mrf24j40_int(void);
-
 
 #ifdef __cplusplus
 }
