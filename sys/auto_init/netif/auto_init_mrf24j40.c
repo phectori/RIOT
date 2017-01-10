@@ -40,7 +40,7 @@
 
 static mrf24j40_t mrf24j40_devs[MRF24J40_NUM];
 static gnrc_netdev2_t gnrc_adpt[MRF24J40_NUM];
-static char _mrf24j40_stacks[MRF24J40_MAC_STACKSIZE][MRF24J40_NUM];
+static char _mrf24j40_stacks[MRF24J40_NUM][MRF24J40_MAC_STACKSIZE];
 
 void auto_init_mrf24j40(void)
 {
