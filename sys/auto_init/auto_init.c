@@ -258,6 +258,7 @@ void auto_init(void)
 /* initialize sensors and actuators */
 #ifdef MODULE_AUTO_INIT_SAUL
     DEBUG("auto_init SAUL\n");
+#endif
 
 #ifdef MODULE_SAUL_GPIO
     extern void auto_init_gpio(void);

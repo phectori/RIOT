@@ -69,6 +69,7 @@ ifneq (,$(filter bmp180,$(USEMODULE)))
 endif
 ifneq (,$(filter jc42,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/jc42/include
+endif
 ifneq (,$(filter bme280,$(USEMODULE)))
     USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bme280/include
 endif
