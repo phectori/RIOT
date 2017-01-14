@@ -19,7 +19,7 @@
  */
 
 #ifdef MODULE_BME280
-#error "ERROR. When is this activated?"
+
 #include "log.h"
 #include "saul_reg.h"
 
@@ -40,15 +40,6 @@ static bme280_t bme280_devs[BME280_NUMOF];
  * @brief   Memory for the SAUL registry entries
  */
 static saul_reg_t saul_entries[BME280_NUMOF * 3];
-
-/**
- * @brief   Reference the driver structs.
- * @{
- */
-extern const saul_driver_t bme280_temperature_saul_driver;
-extern const saul_driver_t bme280_relative_humidity_saul_driver;
-extern const saul_driver_t bme280_pressure_saul_driver;
-/** @} */
 
 void auto_init_bme280(void)
 {

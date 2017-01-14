@@ -41,19 +41,6 @@
 int main(void)
 {
     bme280_t dev;
-#if 0
-    /* Weather monitoring */
-    bme280_settings_t settings = {
-        .i2c_dev = TEST_I2C,
-        .i2c_addr = TEST_I2C_ADDR,
-        .t_sb = BME280_SB_0_5,
-        .filter = BME280_FILTER_OFF,
-        .runMode = BME280_MODE_FORCED,
-        .tempOverSample = BME280_OSRS_X1,
-        .pressOverSample = BME280_OSRS_X1,
-        .humidOverSample = BME280_OSRS_X1,
-    };
-#endif
     int16_t temperature;
     uint32_t pressure;
     uint16_t humidity;

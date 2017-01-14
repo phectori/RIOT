@@ -30,6 +30,7 @@
 #ifndef BME280_H_
 #define BME280_H_
 
+#include "saul.h"
 #include "periph/i2c.h"
 
 #ifdef __cplusplus
@@ -147,6 +148,15 @@ typedef struct {
     bme280_params_t params;             /**< Device Parameters */
     bme280_calibration_t calibration;   /**< Calibration Data */
 } bme280_t;
+
+/**
+ * @brief export SAUL endpoints
+ * @{
+ */
+extern const saul_driver_t bme280_temperature_saul_driver;
+extern const saul_driver_t bme280_relative_humidity_saul_driver;
+extern const saul_driver_t bme280_pressure_saul_driver;
+/** @} */
 
 /**
  * @brief auto-initialize all configured BME280 devices
