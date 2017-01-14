@@ -302,6 +302,9 @@ void auto_init(void)
 #ifdef MODULE_JC42
     extern void auto_init_jc42(void);
     auto_init_jc42();
+#ifdef MODULE_BME280
+    extern void auto_init_bme280(void);
+    auto_init_bme280();
 #endif
 
 #endif /* MODULE_AUTO_INIT_SAUL */
