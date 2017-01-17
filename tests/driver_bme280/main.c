@@ -26,8 +26,8 @@
 #error "TEST_I2C_ADDR not defined"
 #endif
 /* These defines to pass the above values on to bme280_params.h */
-#define BME280_PARAM_I2C_DEV    TEST_I2C
-#define BME280_PARAM_I2C_ADDR   TEST_I2C_ADDR
+//#define BME280_PARAM_I2C_DEV    TEST_I2C
+//#define BME280_PARAM_I2C_ADDR   TEST_I2C_ADDR
 
 #include <stdio.h>
 #include <inttypes.h>

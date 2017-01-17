@@ -145,7 +145,7 @@ int bme280_init(bme280_t* dev, const bme280_params_t* params)
  */
 int16_t bme280_read_temperature(bme280_t* dev)
 {
-    assert(!dev);
+    //assert(!dev);
 
     if (do_measurement(dev) < 0) {
         return INT16_MIN;
@@ -182,7 +182,7 @@ int16_t bme280_read_temperature(bme280_t* dev)
  */
 uint32_t bme280_read_pressure(bme280_t *dev)
 {
-    assert(!dev);
+    //assert(!dev);
 
     bme280_calibration_t *cal = &dev->calibration;      /* helper variable */
 
@@ -223,7 +223,7 @@ uint32_t bme280_read_pressure(bme280_t *dev)
 
 uint16_t bme280_read_humidity(bme280_t *dev)
 {
-    assert(!dev);
+    //assert(!dev);
 
     bme280_calibration_t *cal = &dev->calibration;      /* helper variable */
 

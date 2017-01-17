@@ -63,6 +63,9 @@ extern "C" {
 #define MRF24J40_PARAM_INT         (GPIO_PIN(0, 3))
 #define MRF24J40_PARAM_RESET       (GPIO_PIN(0, 2))
 
+#define BME280_PARAM_I2C_DEV       (I2C_0)
+#define BME280_PARAM_I2C_ADDR      (0x77)
+
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
